@@ -5,7 +5,7 @@ set -Eeuo pipefail
 supportedVersions=(
 	13
 	12
-	11
+	11.5
 	10
 	9.6
 	9.5

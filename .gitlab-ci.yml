@@ -1,0 +1,27 @@
+---
+include: 'https://code.gaas.nl/generic/ci-templates/raw/master/.docker-testing.yml'
+
+variables:
+  POSTGRES_UPGRADE_VERSIONS: '9.5-to-11.5'
+  IMAGE_TAG:        '$CI_REGISTRY_IMAGE:$POSTGRES_UPGRADE_VERSIONS'
+
+stages:
+    - test
+    - build
+    - container_scanning
+
+build:image:
+  image: docker:stable
+  stage: build
+  only:
+    refs:
+      - master
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build --force-rm --pull -t $IMAGE_TAG $POSTGRES_UPGRADE_VERSIONS
+    - docker push $IMAGE_TAG
+  dependencies:
+    - test:hadolint
+    - test:shellcheck
+    - test:gitlint
+
